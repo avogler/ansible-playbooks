@@ -1,0 +1,17 @@
+---
+
+- name: set host name
+  hostname: name={{ hostname }}
+
+- name: update software
+  apt: update_cache=yes upgrade=dist
+
+- name: install reqired packages
+  apt: name={{ item }} state=latest
+  with_items:
+    - fail2ban
+
+- name: configure fail2ban
+  template: src=jail.local dest=/etc/fail2ban/
+  notify:
+    - restart fail2ban
