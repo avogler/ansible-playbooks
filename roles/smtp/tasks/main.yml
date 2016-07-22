@@ -1,4 +1,55 @@
 ---
 
+- name: install reqired packages
+  apt: name={{ item }} state=latest
+  with_items:
+    - postfix
+    - libsasl2-modules
+    - bsd-mailx
+    - mariadb-client
+    - mariadb-server
+    - python-mysqldb
+
+- name: recreate DH parameters daily for SSL
+  cron: name=dhparam special_time=daily state=present job="openssl dhparam 2048 -out /etc/ssl/dh2048.pem"
+
+- name: set mysql root password
+  mysql_user: login_user=root login_password={{ mysql_root_pwd }} check_implicit_admin=yes name=root password={{ mysql_root_pwd }} state=present
+
+- name: set mysql root password
+  mysql_user: login_user=root login_password={{ mysql_root_pwd }} check_implicit_admin=yes host=% name=root password={{ mysql_root_pwd }} state=present
+
+- name: create vmail database
+  mysql_db: name=vmail login_user=root login_password={{ mysql_root_pwd }} state=present
+
+- name: create vmail user
+  mysql_user: login_user=root login_password={{ mysql_root_pwd }} check_implicit_admin=yes host=% name=vmail password={{ mysql_vmail_pwd }} priv=vmail.*:ALL state=present
+
+- name: copy vmail tables script
+  template: src=vmail.sql dest=/tmp
+
+- name: import vmail tables
+  mysql_db: name=vmail state=import target=/tmp/vmail.sql login_user=vmail login_password={{ mysql_vmail_pwd }}
+
+- name: create system vmail group
+  group: name=vmail state=present system=yes
+
+- name: create system vmail user
+  user: name=vmail state=present group=vmail system=yes home=/var/lib/vmail createhome=no
+
+- name: create vmail directory
+  file: name=/var/lib/vmail state=directory owner=vmail group=vmail mode=770
+
+- name: create vmail mailbox directory
+  file: name=/var/lib/vmail/mailboxes state=directory owner=vmail group=vmail mode=770
+
+- name: create vmail sieve directory
+  file: name=/var/lib/vmail/sieve/global state=directory owner=vmail group=vmail mode=770
+  
+- name: configure postfix
+  template: src=main.cf dest=/etc/postfix/main.cf
+  notify:
+    - restart postfix
+
 - name: configure ufw for smtp
   ufw: rule=allow port=smtp proto=tcp
