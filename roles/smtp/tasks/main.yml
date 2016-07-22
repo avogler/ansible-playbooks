@@ -1,0 +1,4 @@
+---
+
+- name: configure ufw for smtp
+  ufw: rule=allow port=smtp proto=tcp

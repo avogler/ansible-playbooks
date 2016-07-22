@@ -10,8 +10,16 @@
   apt: name={{ item }} state=latest
   with_items:
     - fail2ban
+    - ufw
+
+- name: configure ufw for ssh
+  ufw: rule=allow port=ssh proto=tcp
+
+- name: configure ufw default policy and logging
+  ufw: state=enabled policy=deny logging=low
 
 - name: configure fail2ban
   template: src=jail.local dest=/etc/fail2ban/
   notify:
     - restart fail2ban
+
