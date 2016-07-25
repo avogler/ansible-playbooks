@@ -4,14 +4,22 @@
   apt: name={{ item }} state=latest
   with_items:
     - postfix
+    - postfix-mysql
     - libsasl2-modules
     - bsd-mailx
     - mariadb-client
     - mariadb-server
     - python-mysqldb
+    - dovecot-core
+    - dovecot-imapd
+    - dovecot-lmtpd
+    - dovecot-mysql
+    - dovecot-sieve
+    - dovecot-managesieved
+    - dovecot-antispam
 
 - name: recreate DH parameters daily for SSL
-  cron: name=dhparam special_time=daily state=present job="openssl dhparam 2048 -out /etc/ssl/dh2048.pem"
+  cron: name=dhparam special_time=daily state=present job="openssl dhparam 2048 -out /etc/ssl/dh2048.pem &> /dev/null"
 
 - name: set mysql root password
   mysql_user: login_user=root login_password={{ mysql_root_pwd }} check_implicit_admin=yes name=root password={{ mysql_root_pwd }} state=present
@@ -45,9 +53,51 @@
 
 - name: create vmail sieve directory
   file: name=/var/lib/vmail/sieve/global state=directory owner=vmail group=vmail mode=770
+
+- name: remove dovecot distro config
+  file: name=/etc/dovecot/{{ item }} state=absent
+  with_items:
+    - conf.d
+    - private
+    - README
+    - dovecot-dict-auth.conf.ext
+    - dovecot-dict-sql.conf.ext
+    - dovecot-sql.conf.ext
+
+- name: configure dovecot
+  template: src={{ item }} dest=/etc/dovecot/
+  with_items:
+    - dovecot.conf
+    - dovecot-sql.conf
+  notify:
+    - restart dovecot
+
+- name: remove postfix distro config
+  file: name=/etc/postfix/{{ item }} state=absent
+  with_items:
+    - sasl
+
+- name: create dir for postfix sql config
+  file: name=/etc/postfix/sql state=directory
+
+- name: configure postfix sql
+  template: src={{ item }} dest=/etc/postfix/sql/ mode=660
+  with_items:
+    - sql/accounts.cf
+    - sql/aliases.cf
+    - sql/domains.cf
+    - sql/recipient-access.cf
+    - sql/sender-login-maps.cf
+  notify:
+    - restart postfix
+
   
 - name: configure postfix
-  template: src=main.cf dest=/etc/postfix/main.cf
+  template: src={{ item }} dest=/etc/postfix/ mode=660
+  with_items:
+    - main.cf
+    - master.cf
+    - submission_header_cleanup
   notify:
     - restart postfix
 

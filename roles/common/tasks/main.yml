@@ -16,7 +16,7 @@
   ufw: rule=allow port=ssh proto=tcp
 
 - name: configure ufw default policy and logging
-  ufw: state=enabled policy=deny logging=low
+  ufw: state=enabled policy=deny
 
 - name: configure fail2ban
   template: src=jail.local dest=/etc/fail2ban/
