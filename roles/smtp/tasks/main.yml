@@ -3,6 +3,7 @@
 - name: install reqired packages
   apt: name={{ item }} state=latest
   with_items:
+    - letsencrypt
     - postfix
     - postfix-mysql
     - libsasl2-modules
@@ -101,5 +102,9 @@
   notify:
     - restart postfix
 
-- name: configure ufw for smtp
-  ufw: rule=allow port=smtp proto=tcp
+- name: configure ufw for postfix/dovecot
+  ufw: rule=allow port={{ item }} proto=tcp
+  with_items:
+    - 25
+    - 143
+    - 587
