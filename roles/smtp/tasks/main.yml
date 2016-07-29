@@ -11,6 +11,11 @@
     - mariadb-client
     - mariadb-server
     - python-mysqldb
+    - libmilter1.0.1
+    - unzip
+    - amavisd-new
+    - libdbi-perl
+    - libdbd-mysql-perl
     - dovecot-core
     - dovecot-imapd
     - dovecot-lmtpd
@@ -18,6 +23,12 @@
     - dovecot-sieve
     - dovecot-managesieved
     - dovecot-antispam
+
+- name: copy amavisd-milter deb package
+  copy: src=amavisd-milter_1.6.1-1_amd64.deb dest=/tmp/
+
+- name: install amavisd-milter
+  apt: deb=/tmp/amavisd-milter_1.6.1-1_amd64.deb
 
 - name: recreate DH parameters daily for SSL
   cron: name=dhparam special_time=daily state=present job="openssl dhparam 2048 -out /etc/ssl/dh2048.pem &> /dev/null"
@@ -54,6 +65,16 @@
 
 - name: create vmail sieve directory
   file: name=/var/lib/vmail/sieve/global state=directory owner=vmail group=vmail mode=770
+
+- name: configure amavis-new
+  template: src=50-user dest=/etc/amavis/conf.d/50-user mode=770
+  notify:
+  - restart amavis-new
+
+- name: configure amavisd-milter
+  template: src=amavisd-milter dest=/etc/default/amavisd-milter
+  notify:
+  - restart amavisd-milter
 
 - name: remove dovecot distro config
   file: name=/etc/dovecot/{{ item }} state=absent

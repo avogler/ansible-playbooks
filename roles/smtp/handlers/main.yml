@@ -3,3 +3,9 @@
 
 - name: restart dovecot
   service: name=dovecot state=restarted
+
+- name: restart amavis-new
+  service: name=amavis state=restarted
+
+- name: restart amavisd-milter
+  service: name=amavisd-milter state=restarted
