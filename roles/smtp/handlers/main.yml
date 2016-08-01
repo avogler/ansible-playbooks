@@ -9,3 +9,6 @@
 
 - name: restart amavisd-milter
   service: name=amavisd-milter state=restarted
+
+- name: restart postgrey
+  service: name=postgrey state=restarted

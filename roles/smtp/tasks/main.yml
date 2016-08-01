@@ -23,6 +23,7 @@
     - dovecot-sieve
     - dovecot-managesieved
     - dovecot-antispam
+    - postgrey
 
 - name: copy amavisd-milter deb package
   copy: src=amavisd-milter_1.6.1-1_amd64.deb dest=/tmp/
@@ -93,6 +94,11 @@
     - dovecot-sql.conf
   notify:
     - restart dovecot
+
+- name: configure postgrey
+  template: src=postgrey dest=/etc/default/postgrey
+  notify:
+    - restart postgrey
 
 - name: remove postfix distro config
   file: name=/etc/postfix/{{ item }} state=absent

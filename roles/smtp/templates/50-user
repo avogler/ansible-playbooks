@@ -52,14 +52,14 @@ $enable_dkim_verification = 1;
 ###
 
 ### Spam-Checks aktivieren
-@bypass_spam_checks_maps = (\%bypass_spam_checks, \@bypass_spam_checks_acl, \$bypass_spam_checks_re);
-$sa_tag_level_deflt = -999;         # Informationen zu Spam-Score ab diesem Level (hier: immer) in den Header schreiben
-$sa_tag2_level_deflt = 6.0;         # Ab diesem Level E-Mails als Spam markieren
-$sa_kill_level_deflt = 7.2;         # Ab diesem Level E-Mails nicht annehmen, sondern Aktion in "final_spam_destiny" auslösen (REJECT)
+#@bypass_spam_checks_maps = (\%bypass_spam_checks, \@bypass_spam_checks_acl, \$bypass_spam_checks_re);
+#$sa_tag_level_deflt = -999;         # Informationen zu Spam-Score ab diesem Level (hier: immer) in den Header schreiben
+#$sa_tag2_level_deflt = 6.0;         # Ab diesem Level E-Mails als Spam markieren
+#$sa_kill_level_deflt = 7.2;         # Ab diesem Level E-Mails nicht annehmen, sondern Aktion in "final_spam_destiny" auslösen (REJECT)
 
-$sa_spam_subject_tag = undef;       # Kein ***SPAM*** in den Betreff schreiben, falls Spam
-$spam_quarantine_to = undef;        # Spam nicht in die Quarantäne verschieben
-$final_spam_destiny = D_REJECT;     # Aktion, wenn kill_level erreicht wurde: E-Mail nicht annehmen und REJECT auslösen
+#$sa_spam_subject_tag = undef;       # Kein ***SPAM*** in den Betreff schreiben, falls Spam
+#$spam_quarantine_to = undef;        # Spam nicht in die Quarantäne verschieben
+#$final_spam_destiny = D_REJECT;     # Aktion, wenn kill_level erreicht wurde: E-Mail nicht annehmen und REJECT auslösen
 
 
 ###
