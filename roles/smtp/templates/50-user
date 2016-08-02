@@ -61,6 +61,13 @@ $enable_dkim_verification = 1;
 #$spam_quarantine_to = undef;        # Spam nicht in die Quarantäne verschieben
 #$final_spam_destiny = D_REJECT;     # Aktion, wenn kill_level erreicht wurde: E-Mail nicht annehmen und REJECT auslösen
 
+###
+### ClamAV
+###
+
+@bypass_virus_checks_maps = (
+   \%bypass_virus_checks, \@bypass_virus_checks_acl, \$bypass_virus_checks_re);
+
 
 ###
 ### Falls Benachrichtigungsmails an User geschickt werden sollen (z.B. bei geblockter Mail)

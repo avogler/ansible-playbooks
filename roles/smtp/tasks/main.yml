@@ -13,6 +13,7 @@
     - python-mysqldb
     - libmilter1.0.1
     - unzip
+    - clamav-daemon
     - amavisd-new
     - libdbi-perl
     - libdbd-mysql-perl
@@ -66,6 +67,20 @@
 
 - name: create vmail sieve directory
   file: name=/var/lib/vmail/sieve/global state=directory owner=vmail group=vmail mode=770
+
+- name: add clamav user to amavis group
+  user: name=clamav append=yes groups=amavis
+  notify: restart clamav
+
+- name: allow clamav to use supplementary groups
+  lineinfile: dest=/etc/clamav/clamd.conf regexp=^AllowSupplementaryGroups line="AllowSupplementaryGroups true"
+  notify: restart clamav
+
+- name: update clamav database
+  shell: freshclam
+  args:
+    creates: /var/lib/clamav/daily.cvd
+  notify: restart clamav
 
 - name: configure amavis-new
   template: src=50-user dest=/etc/amavis/conf.d/50-user mode=770
