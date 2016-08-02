@@ -1,5 +1,19 @@
 [DEFAULT]
 banaction = ufw
+postfix_log = %(syslog_mail)s
+dovecot_log = %(syslog_mail)s
 
 [sshd]
+enabled = true
+
+[dovecot]
+enabled = true
+
+[postfix]
+enabled = true
+
+[postfix-rbl]
+enabled = true
+
+[postfix-sasl]
 enabled = true
