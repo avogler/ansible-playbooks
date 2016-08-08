@@ -1,0 +1,1 @@
+default    %:mail:/etc/opendkim/keys/mail.private

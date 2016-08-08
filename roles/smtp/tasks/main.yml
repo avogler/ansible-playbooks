@@ -14,6 +14,8 @@
     - libmilter1.0.1
     - unzip
     - clamav-daemon
+    - opendkim
+    - opendkim-tools
     - amavisd-new
     - libdbi-perl
     - libdbd-mysql-perl
@@ -67,6 +69,34 @@
 
 - name: create vmail sieve directory
   file: name=/var/lib/vmail/sieve/global state=directory owner=vmail group=vmail mode=770
+
+- name: create opendkim directories
+  file: name=/etc/opendkim/keys state=directory owner=opendkim
+
+- name: add postfix user to opendkim group
+  user: name=postfix append=yes groups=opendkim
+  notify: restart postfix
+
+- name: configure opendkim
+  template: src=opendkim.conf dest=/etc/opendkim.conf
+  notify: restart opendkim
+
+- name: configure opendkim keys
+  template: src={{ item }} dest=/etc/opendkim
+  with_items:
+    - keytable
+    - signingtable
+  notify: restart opendkim
+
+- name: create opendkim keys
+  command: opendkim-genkey --selector=mail --bits=2048 --directory=keys
+  args:
+    chdir: /etc/opendkim
+    creates: /etc/opendkim/keys/mail.txt
+  notify: restart opendkim
+
+- name: set owner of dkim key
+  file: path=/etc/opendkim/keys/mail.private owner=opendkim state=file
 
 - name: add clamav user to amavis group
   user: name=clamav append=yes groups=amavis
@@ -150,3 +180,4 @@
     - 25
     - 143
     - 587
+    - 4190

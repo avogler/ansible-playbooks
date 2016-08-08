@@ -15,3 +15,6 @@
 
 - name: restart clamav
   service: name=clamav-daemon state=restarted
+
+- name: restart opendkim
+  service: name=opendkim state=restarted
